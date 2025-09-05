@@ -1,0 +1,5 @@
+### GET request to example server
+GET https://discord.com/api/v10/invites/ZGfbbXcN?with_counts=true&with_expiration=true
+
+
+###
