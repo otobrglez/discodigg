@@ -5,6 +5,8 @@ use reqwest::Url;
 use rust_yaml::{Value, Yaml};
 use std::error::Error;
 use std::path::PathBuf;
+use std::time::Duration;
+use tokio::time::sleep;
 
 pub fn resolve_invite_urls(urls: Vec<String>) -> Result<Vec<Url>, Box<dyn Error>> {
     urls.into_iter()
@@ -55,7 +57,7 @@ pub async fn collect_from<I>(invite_urls: I) -> Result<Vec<InviteInfo>, Box<dyn 
 where
     I: IntoIterator<Item = Url>,
 {
-    let concurrency_limit = 3;
+    let concurrency_limit = 2;
     let client = discord::DiscordAPIClient::new();
 
     let invite_codes: Vec<String> = invite_urls
@@ -69,7 +71,14 @@ where
             async move {
                 match client.get_invite_info(code.clone()).await {
                     Ok(info) => Ok::<_, Box<dyn Error>>(info),
-                    Err(e) => Err::<InviteInfo, _>(format!("{}: {}", code, e).into()),
+                    Err(e) => {
+                        log::warn!("Request failed. {}: {}. Retry in 5 seconds.", code, e);
+                        sleep(Duration::from_secs(5)).await;
+                        match client.get_invite_info(code.clone()).await {
+                            Ok(info) => Ok::<_, Box<dyn Error>>(info),
+                            Err(e2) => Err::<InviteInfo, _>(format!("{}: {}", code, e2).into()),
+                        }
+                    }
                 }
             }
         })
