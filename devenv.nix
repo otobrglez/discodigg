@@ -9,6 +9,7 @@
 
   packages = [ 
     pkgs.git
+    pkgs.bacon
   ];
 
   languages.rust = {

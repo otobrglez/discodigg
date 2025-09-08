@@ -53,11 +53,17 @@ fn get_invite_code_from_url(url: &Url) -> Result<String, Box<dyn Error>> {
     Ok(code.to_string())
 }
 
-pub async fn collect_from<I>(invite_urls: I) -> Result<Vec<InviteInfo>, Box<dyn Error>>
+pub async fn collect_from<I>(
+    invite_urls: I,
+    concurrency_limit: Option<usize>,
+    max_retries: Option<usize>,
+) -> Result<Vec<InviteInfo>, Box<dyn Error>>
 where
     I: IntoIterator<Item = Url>,
 {
-    let concurrency_limit = 2;
+    let concurrency_limit = concurrency_limit.unwrap_or(2);
+    let max_retries = max_retries.unwrap_or(3);
+
     let client = discord::DiscordAPIClient::new();
 
     let invite_codes: Vec<String> = invite_urls
@@ -70,7 +76,6 @@ where
             let client = &client;
             async move {
                 let mut attempt = 0usize;
-                let max_retries = 3usize;
                 let mut delay = Duration::from_secs(5);
 
                 loop {
