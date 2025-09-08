@@ -69,14 +69,29 @@ where
         .map(|code| {
             let client = &client;
             async move {
-                match client.get_invite_info(code.clone()).await {
-                    Ok(info) => Ok::<_, Box<dyn Error>>(info),
-                    Err(e) => {
-                        log::warn!("Request failed. {}: {}. Retry in 5 seconds.", code, e);
-                        sleep(Duration::from_secs(5)).await;
-                        match client.get_invite_info(code.clone()).await {
-                            Ok(info) => Ok::<_, Box<dyn Error>>(info),
-                            Err(e2) => Err::<InviteInfo, _>(format!("{}: {}", code, e2).into()),
+                let mut attempt = 0usize;
+                let max_retries = 3usize;
+                let mut delay = Duration::from_secs(5);
+
+                loop {
+                    match client.get_invite_info(code.clone()).await {
+                        Ok(info) => return Ok::<_, Box<dyn Error>>(info),
+                        Err(e) => {
+                            if attempt >= max_retries {
+                                return Err::<InviteInfo, _>(format!("{}: {}", code, e).into());
+                            }
+                            let next_retry = attempt + 1;
+                            log::warn!(
+                                "Request failed. {}: {}. Retry {}/{} in {} seconds.",
+                                code,
+                                e,
+                                next_retry,
+                                max_retries,
+                                delay.as_secs()
+                            );
+                            sleep(delay).await;
+                            attempt += 1;
+                            delay = delay.saturating_mul(2);
                         }
                     }
                 }

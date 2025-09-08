@@ -15,8 +15,8 @@ servers:
     invite_url: https://discord.gg/6SnQKrFRmA
   - name: Ogrodje
     invite_url: https://discord.gg/xV2Xc4VX9W
-  - name: Radioklub Vegova S59VEG
-    invite_url: https://discord.com/invite/JNysceft
+  #  - name: Radioklub Vegova S59VEG
+  #    invite_url: https://discord.com/invite/JNysceft
   - name: GAMING SLOVENIA
     invite_url: https://discord.com/invite/YfEfcFU6ew
   - name: Gaming SI
@@ -31,7 +31,9 @@ servers:
     invite_url: https://discord.gg/slz-discord-549464051797721099
   - name: KOMPONENTKO
     invite_url: https://discord.gg/komponentko-1022154368730005554
-  - name: Emona RP
-    invite_url: https://discord.gg/emona
+  #  - name: Emona RP
+  #    invite_url: https://discord.com/invite/emona
   - name: .NET & Azure Meetup Štajerska
     invite_url: https://discord.gg/BTbZPWwazK
+  - name: VirtuSlo 4Endurance
+    invite_url: https://discord.com/invite/x8CNEMRteS
