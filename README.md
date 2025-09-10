@@ -6,6 +6,7 @@ System for observing Discord servers and their membership.
 
 - Please use [devenv] for development with [Scala CLI][scala-cli].
 - All the "tasks" are written in [`justfile`](./justfile) and can be run with [just](https://just.systems/) command runner.
+- System uses the latest JVM 24, with ZIO, ZIO HTTP and Scala 3.x
 
 ## Author
 
