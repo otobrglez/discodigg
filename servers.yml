@@ -15,7 +15,6 @@ servers:
     inviteUrl: https://discord.gg/6SnQKrFRmA
   - name: Ogrodje
     inviteUrl: https://discord.gg/xV2Xc4VX9W
-
   - name: GAMING SLOVENIA
     inviteUrl: https://discord.com/invite/YfEfcFU6ew
   - name: Gaming SI
@@ -30,14 +29,12 @@ servers:
     inviteUrl: https://discord.gg/slz-discord-549464051797721099
   - name: KOMPONENTKO
     inviteUrl: https://discord.gg/komponentko-1022154368730005554
-
   - name: .NET & Azure Meetup Štajerska
     inviteUrl: https://discord.gg/BTbZPWwazK
   - name: VirtuSlo 4Endurance
     inviteUrl: https://discord.com/invite/x8CNEMRteS
-
   - name: Money-How
-    inviteUrl: https://discord.com/invite/BTveqSby
-
+    inviteUrl: https://discord.gg/ST7cZYp27X
+    # https://money-how.si/skupnost-money-how
   - name: Apparatus klub
     inviteUrl: https://discord.com/invite/Xxs44j69j7

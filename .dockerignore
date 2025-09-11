@@ -1,0 +1,8 @@
+.bsp
+.devenv
+.direnv
+.idea
+.metals
+.scala-build
+k8s
+.envrc
