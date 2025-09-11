@@ -44,7 +44,9 @@ jobs:
 
       - uses: coursier/cache-action@v6.4
       - uses: VirtusLab/scala-cli-setup@v1.5
-      - run: |
+
+      - name: "Build Docker image with Scala CLI"
+        run: |
           scala-cli \
             --power package \
             --jvm 24 \
@@ -52,4 +54,5 @@ jobs:
             --docker . \
             --docker-from=azul/zulu-openjdk-alpine:24-jre-headless-latest \
             --docker-image-repository=ghcr.io/otobrglez/discodigg \
-            --docker-image-tag=${{ env.VERSION }}
+            --docker-image-tag=${{ env.VERSION }} && \
+          docker push ghcr.io/otobrglez/discodigg:${{ env.VERSION }}
