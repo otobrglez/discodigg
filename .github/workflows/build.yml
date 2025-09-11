@@ -20,6 +20,12 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
 
+      - name: Read version from VERSION file
+        run: |
+          VERSION=$(cat VERSION | tr -d '\n')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - uses: docker/setup-buildx-action@v3
 
       - name: Log into registry ${{ env.REGISTRY }}
@@ -42,8 +48,8 @@ jobs:
           scala-cli \
             --power package \
             --jvm 24 \
-            --project-version=0.0.1-dev \
+            --project-version=${{ env.VERSION }} \
             --docker . \
             --docker-from=azul/zulu-openjdk-alpine:24-jre-headless-latest \
             --docker-image-repository=ghcr.io/otobrglez/discodigg \
-            --docker-image-tag=0.0.1-dev
+            --docker-image-tag=${{ env.VERSION }}
