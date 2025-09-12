@@ -18,6 +18,7 @@ object WebServer:
         tag("style")(
           """html, body { font-family: sans-serif; font-size: 14pt; line-height: 1.5; }
             |#app { margin: 0 auto; padding: 10px; max-width: 960px; }
+            |#app table { border-collapse: collapse; margin: 0 auto; }
             |#app table td { padding: 5px; } """.stripMargin
         )
       ),
@@ -49,7 +50,6 @@ object WebServer:
         Html.raw(
           layout("Discord Strežniki") {
             table(
-              border := "1",
               thead(
                 tr(
                   th("Strežnik"),
