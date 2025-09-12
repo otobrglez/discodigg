@@ -9,18 +9,20 @@ import zio.http.template.Html
 
 object WebServer:
 
-  private def layout(title: String = "Discord Strežniki")(content: TypedTag[String]*) =
+  private def layout(title: String = "Discord Strežniki")(contentBody: TypedTag[String]*) =
     html(
       head(
         meta(charset := "UTF-8"),
+        meta(name    := "viewport", content := "width=device-width, initial-scale=1"),
         tag("title")(title),
         tag("style")(
           """html, body { font-family: sans-serif; font-size: 14pt; line-height: 1.5; }
-            |#app { margin: 0 auto; padding: 10px; max-width: 960px; }""".stripMargin
+            |#app { margin: 0 auto; padding: 10px; max-width: 960px; }
+            |#app table td { padding: 5px; } """.stripMargin
         )
       ),
       body(
-        div(id := "app", content)
+        div(id := "app", contentBody)
       )
     )
 
@@ -28,14 +30,14 @@ object WebServer:
     ServersMap.all
       .map(
         _.toList
-          .sortBy(-_._2.memberCount)
+          .sortBy(-_._2.presenceCount)
           .map { case (server, stats) =>
             val members   = stats.memberCount.toString
             val presences = stats.presenceCount.toString
             s"""<tr>
                |  <td>${server.name}</td>
-               |  <td>${members}</td>
-               |  <td>${presences}</td>
+               |  <td>$members</td>
+               |  <td>$presences</td>
                |</tr>""".stripMargin
           }
           .mkString
@@ -50,9 +52,9 @@ object WebServer:
               border := "1",
               thead(
                 tr(
-                  th("Server"),
-                  th("Members"),
-                  th("Presences")
+                  th("Strežnik"),
+                  th("Člani"),
+                  th("Prisotnost")
                 )
               ),
               tbody(raw(content))

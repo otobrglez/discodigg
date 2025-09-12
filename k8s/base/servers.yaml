@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: servers-config
+data:
+  servers.yml: |
+    servers:
+      - name: Vibes And Coding
+        inviteUrl: https://discord.gg/zrwjCWVbVE
+      - name: Klub Ada Skupnost
+        inviteUrl: https://discord.gg/8QPM8k6n6U
+      - name: DragonHack
+        inviteUrl: https://discord.com/invite/4SBrNttcvA
+      - name: Linux Slovenija
+        inviteUrl: ht4tps://discord.gg/2fsYq4q4W8
+      - name: Slo-Tech
+        inviteUrl: https://discord.gg/fTCrPJMavg
+      - name: Slovenia Games
+        inviteUrl: https://discord.gg/DPxVvxJGMz
+      - name: Transformation Lighthouse
+        inviteUrl: https://discord.gg/6SnQKrFRmA
+      - name: Ogrodje
+        inviteUrl: https://discord.gg/xV2Xc4VX9W
+      - name: GAMING SLOVENIA
+        inviteUrl: https://discord.com/invite/YfEfcFU6ew
+      - name: Gaming SI
+        inviteUrl: https://discord.com/invite/NYM7GDncna
+      - name: Product Hub
+        inviteUrl: https://discord.gg/taJeShpHuJ
+      - name: Slovenska skupnost za jezikovne vire in tehnologije
+        inviteUrl: https://discord.gg/gV2tDK6QqS
+      - name: NEREALNI
+        inviteUrl: https://discord.gg/n-e-r-e-a-l-n-i-705762057206628364
+      - name: SLZ Discord
+        inviteUrl: https://discord.gg/slz-discord-549464051797721099
+      - name: KOMPONENTKO
+        inviteUrl: https://discord.gg/komponentko-1022154368730005554
+      - name: .NET & Azure Meetup Štajerska
+        inviteUrl: https://discord.gg/BTbZPWwazK
+      - name: VirtuSlo 4Endurance
+        inviteUrl: https://discord.com/invite/x8CNEMRteS
+      - name: Money-How
+        inviteUrl: https://discord.gg/ST7cZYp27X
+        # https://money-how.si/skupnost-money-how
+      - name: Apparatus klub
+        inviteUrl: https://discord.com/invite/Xxs44j69j7

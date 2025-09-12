@@ -1,0 +1,7 @@
+resources:
+  - init.yaml
+  - servers.yaml
+  - discodigg.yaml
+images:
+  - name: ghcr.io/otobrglez/discodigg
+    newTag: '0.0.4'
