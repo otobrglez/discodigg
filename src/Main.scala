@@ -34,6 +34,7 @@ import scala.collection.concurrent.TrieMap
 
 object Main extends ZIOCliDefault:
 
+  // Environment and logging setup
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
     LoggerSetup.live >>> setConfigProvider(ConfigProvider.envProvider) >>>
       removeDefaultLoggers >>> SLF4J.slf4j

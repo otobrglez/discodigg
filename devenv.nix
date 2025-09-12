@@ -43,13 +43,7 @@ in
   enterShell = ''
     echo JAVA_HOME=$JAVA_HOME
     export PATH=$PATH
-
-    echo "Installing dependencies (TODO)"
-    # yarn install && cd ar0-ui; yarn install; cd ..
-
-    echo "Setting kubectx"
-    # export KUBECONFIG="ogrodje-one-config"
-    # kubens ar0-prod
+    kubens discodigg-prod
   '';
 
   enterTest = ''
