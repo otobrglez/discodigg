@@ -75,13 +75,14 @@ final class DiscordAPI private (private val client: Client):
       .map[Either[APIError, Invite]](Left(_))
       .or(Invite.inviteDecoder.map[Either[APIError, Invite]](Right(_)))
 
-  def resolveInvite(code: String): Task[Either[APIError, Invite]] = for
-    response <- client.batched(
-                  Request
-                    .get(s"/invites/$code")
-                    .addQueryParam("with_counts", "true")
-                    .addQueryParam("with_expiration", "true")
-                )
+  private def resolveInvite(code: String): Task[Either[APIError, Invite]] = for
+    response <-
+      client.batched(
+        Request
+          .get(s"/invites/$code")
+          .addQueryParam("with_counts", "true")
+          .addQueryParam("with_expiration", "true")
+      )
     body     <- response.body.asString(Charset.forName("UTF-8"))
     json      = parseJson(body).getOrElse(Json.Null)
     result   <- ZIO.fromEither(json.as[Either[APIError, Invite]])

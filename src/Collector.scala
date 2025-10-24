@@ -2,10 +2,19 @@ package discodigg
 
 import zio.ZIO.logInfo
 import zio.*
-import zio.http.URL
+import zio.http.*
+import zio.metrics.Metric
 import zio.stream.ZStream
 
 final class Collector:
+  private val membersGauge  = Metric.gauge("discord_members", "Number of all members in the server.")
+  private val presenceGauge = Metric.gauge("discord_presence", "Number of members present in the server.")
+
+  private def updateMetrics(server: DiscordServer, serverStats: ServerStats) = for
+    _ <- membersGauge.tagged("server", server.name).set(serverStats.memberCount.toDouble)
+    _ <- presenceGauge.tagged("server", server.name).set(serverStats.presenceCount.toDouble)
+  yield ()
+
   private def codeFromInviteURL(url: URL): Task[String] =
     ZIO.getOrFail(url.path.segments.lastOption)
 
@@ -24,6 +33,7 @@ final class Collector:
               presenceCount = invite.approximate_presence_count.getOrElse(0)
             )
           )
+          .tap(updateMetrics)
       )
       .tap((server, stats) =>
         logInfo(s"Collected from ${server.name}. Members: ${stats.memberCount}, presence: ${stats.presenceCount}")

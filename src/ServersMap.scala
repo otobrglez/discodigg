@@ -15,10 +15,10 @@ object ServersMap:
   def emptyLayer: ULayer[ServersMap] =
     ZLayer.succeed(empty)
 
-  def all: ZIO[ServersMap, Nothing, Iterable[(DiscordServer, ServerStats)]] =
+  def all: URIO[ServersMap, Iterable[(DiscordServer, ServerStats)]] =
     ZIO.serviceWith[ServersMap](_.servers.values)
 
-  def put(name: String, tpl: (DiscordServer, ServerStats)) =
+  def put(name: String, tpl: (DiscordServer, ServerStats)): URIO[ServersMap, Unit] =
     ZIO.serviceWith[ServersMap](_.put(name, tpl))
 
   def layerFromZIO(zio: Task[TrieMap[String, (DiscordServer, ServerStats)]]): TaskLayer[ServersMap] =

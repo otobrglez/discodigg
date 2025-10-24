@@ -1,11 +1,14 @@
 package discodigg
 
 import scalatags.Text.TypedTag
-import zio.{ULayer, ZIO, ZLayer}
+import zio.{durationInt, Duration, RIO, Schedule, Scope, ULayer, ZIO, ZLayer}
 import zio.http.*
 import zio.ZIO.logInfo
 import scalatags.Text.all.*
 import zio.http.template.Html
+import zio.metrics.connectors.prometheus.PrometheusPublisher
+
+import java.nio.charset.{Charset, StandardCharsets}
 
 object WebServer:
 
@@ -70,4 +73,26 @@ object WebServer:
     }.render)
   )
 
-  def run = Server.serve(routes)
+  private val prometheusRoute: Routes[PrometheusPublisher, Response] = Routes(
+    Method.GET / "metrics" -> handler {
+      ZIO
+        .serviceWithZIO[PrometheusPublisher](_.get)
+        .map(response =>
+          Response(
+            status = Status.Ok,
+            headers = Headers(Header.ContentType(MediaType.text.plain, charset = Some(Charset.forName("UTF-8")))),
+            body = Body.fromString(response, StandardCharsets.UTF_8)
+          )
+        )
+    }
+  )
+
+  private def metricServer(metricsPort: Int) = for
+    _      <- logInfo(s"Starting internal metrics server on port $metricsPort")
+    server <- Server.serve(routes = prometheusRoute).provideSomeLayer(Server.defaultWith(_.port(metricsPort)))
+  yield server
+
+  def run(metricsPort: Int) = for
+    _      <- metricServer(metricsPort).forkScoped
+    server <- Server.serve(routes = routes)
+  yield server

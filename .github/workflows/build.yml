@@ -17,7 +17,7 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with: { fetch-depth: 0 }
 
       - name: Read version from VERSION file
@@ -43,18 +43,18 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - uses: coursier/cache-action@v6.4
-      - uses: VirtusLab/scala-cli-setup@v1.5
+      - uses: VirtusLab/scala-cli-setup@v1.9.1
         with:
-          jvm: "24"
+          jvm: "25"
 
       - name: "Build Docker image with Scala CLI"
         run: |
           scala-cli \
             --power package \
-            --jvm 24 \
+            --jvm 25 \
             --project-version=${{ env.VERSION }} \
             --docker . \
-            --docker-from=azul/zulu-openjdk-alpine:24-jre-headless-latest \
+            --docker-from=azul/zulu-openjdk-alpine:25-jre-headless-latest \
             --docker-image-repository=ghcr.io/otobrglez/discodigg \
             --docker-image-tag=${{ env.VERSION }} && \
           docker push ghcr.io/otobrglez/discodigg:${{ env.VERSION }}

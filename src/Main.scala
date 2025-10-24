@@ -1,25 +1,26 @@
 //> using scala "3.7.3"
 //> using buildInfo
-//> using dep dev.zio::zio:2.1.21
-//> using dep dev.zio::zio-streams:2.1.21
-//> using dep dev.zio::zio-http:3.5.0
+//> using dep dev.zio::zio:2.1.22
+//> using dep dev.zio::zio-streams:2.1.22
+//> using dep dev.zio::zio-http:3.5.1
 //> using dep dev.zio::zio-cli:0.7.3
-//> using dep dev.zio::zio-test:2.1.21
+//> using dep dev.zio::zio-test:2.1.22
 //> using dep dev.zio::zio-logging:2.5.1
-//> using dep org.duckdb:duckdb_jdbc:1.3.2.1
-//> using dep io.circe::circe-core:0.14.14
-//> using dep io.circe::circe-generic:0.14.14
-//> using dep io.circe::circe-parser:0.14.14
+//> using dep org.duckdb:duckdb_jdbc:1.4.1.0
+//> using dep io.circe::circe-core:0.14.15
+//> using dep io.circe::circe-generic:0.14.15
+//> using dep io.circe::circe-parser:0.14.15
 //> using dep io.circe::circe-yaml-v12:1.15.0
-//> using dep ch.qos.logback:logback-classic:1.5.18
+//> using dep ch.qos.logback:logback-classic:1.5.20
 //> using dep dev.zio::zio-logging:2.5.1
 //> using dep dev.zio::zio-logging-slf4j2:2.5.1
 //> using dep com.lihaoyi::scalatags:0.13.1
+//> using dep dev.zio::zio-metrics-connectors:2.5.1
+//> using dep dev.zio::zio-metrics-connectors-prometheus:2.5.1
 
 package discodigg
 
 import zio.*
-import zio.Console.printLine
 import zio.Runtime.{removeDefaultLoggers, setConfigProvider}
 import zio.ZIO.{logInfo, serviceWithZIO}
 import zio.cli.*
@@ -31,6 +32,8 @@ import zio.logging.backend.SLF4J
 import java.nio.file.Path
 import scala.cli.build.BuildInfo
 import scala.collection.concurrent.TrieMap
+import zio.metrics.connectors.{prometheus, MetricsConfig}
+import zio.metrics.jvm.DefaultJvmMetrics
 
 object Main extends ZIOCliDefault:
 
@@ -38,6 +41,9 @@ object Main extends ZIOCliDefault:
   override val bootstrap: ZLayer[ZIOAppArgs, Any, Any] =
     LoggerSetup.live >>> setConfigProvider(ConfigProvider.envProvider) >>>
       removeDefaultLoggers >>> SLF4J.slf4j
+
+  // Metrics
+  private val metricsConfig = ZLayer.succeed(MetricsConfig(5.seconds))
 
   // Arguments and options
   private val serverPath: Args[Path]             = Args.file("servers-path", exists = Yes)
@@ -58,15 +64,25 @@ object Main extends ZIOCliDefault:
     case ((port: BigInt, refreshInterval: Duration), path: Path) =>
       {
         ZIO.raceFirst(
-          logInfo(s"Booting server on ${port}") *> WebServer.run,
+          logInfo(
+            s"Booting server on $port with ${BuildInfo.projectVersion.getOrElse("no-version-dev")}"
+          ) *> WebServer.run(metricsPort = port.toInt + 1),
           serviceWithZIO[Collector](_.run(refreshInterval)) :: Nil
         )
       }.provide(
+        Scope.default,
         Client.default,
         DiscordAPI.live,
         Collector.live,
         Server.defaultWithPort(port.toInt),
-        ServersMap.layerFromZIO(serversFromPath(path))
+        ServersMap.layerFromZIO(serversFromPath(path)),
+
+        // Metrics
+        metricsConfig,
+        prometheus.publisherLayer,
+        prometheus.prometheusLayer,
+        Runtime.enableRuntimeMetrics,
+        DefaultJvmMetrics.liveV2.unit
       )
     case (refreshInterval: Duration, path: Path)                 =>
       serviceWithZIO[Collector](_.run(refreshInterval))

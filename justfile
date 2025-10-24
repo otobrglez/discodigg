@@ -1,8 +1,7 @@
 version := `cat VERSION`
 discodigg-image-tag := "discodigg:" + version
 discodigg-image-repository := "registry.ogrodje.si/discodigg/discodigg"
-discodigg-image-repository-base := "azul/zulu-openjdk-alpine:24-jre-headless-latest"
-# discodigg-image-repository-base := "eclipse-temurin:24-jre-alpine"
+discodigg-image-repository-base := "azul/zulu-openjdk-alpine:25-jre-headless-latest"
 
 
 clean:
@@ -11,7 +10,7 @@ clean:
 docker-build: clean
     scala-cli \
       --power package \
-      --jvm 24 \
+      --jvm 25 \
       --project-version={{ version }} \
       --docker . \
       --docker-from={{ discodigg-image-repository-base }} \

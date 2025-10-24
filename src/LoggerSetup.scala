@@ -1,14 +1,13 @@
 package discodigg
 
 import zio.*
-import zio.logging.backend.SLF4J
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.ConsoleAppender
 import org.slf4j.{Logger, LoggerFactory}
 
 object LoggerSetup:
-  def setLogLevels: Task[Unit] = ZIO.attempt:
+  private def setLogLevels: Task[Unit] = ZIO.attempt:
     val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     val rootLogger    = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME)
     val nettyLogger   = loggerContext.getLogger("io.netty")
