@@ -3,7 +3,7 @@
 //> using dep dev.zio::zio:2.1.22
 //> using dep dev.zio::zio-streams:2.1.22
 //> using dep dev.zio::zio-http:3.5.1
-//> using dep dev.zio::zio-cli:0.7.3
+//> using dep dev.zio::zio-cli:0.7.4
 //> using dep dev.zio::zio-test:2.1.22
 //> using dep dev.zio::zio-logging:2.5.1
 //> using dep org.duckdb:duckdb_jdbc:1.4.1.0
@@ -15,8 +15,8 @@
 //> using dep dev.zio::zio-logging:2.5.1
 //> using dep dev.zio::zio-logging-slf4j2:2.5.1
 //> using dep com.lihaoyi::scalatags:0.13.1
-//> using dep dev.zio::zio-metrics-connectors:2.5.1
-//> using dep dev.zio::zio-metrics-connectors-prometheus:2.5.1
+//> using dep dev.zio::zio-metrics-connectors:2.5.2
+//> using dep dev.zio::zio-metrics-connectors-prometheus:2.5.2
 
 package discodigg
 
@@ -96,5 +96,7 @@ object Main extends ZIOCliDefault:
 
   private def serversFromPath(path: Path) =
     DiscordServer.fromPath(path).map { servers =>
-      TrieMap.from(servers.map(server => server.name -> (server, ServerStats.empty)))
+      TrieMap.from(servers.map { case server @ DiscordServer(serverName, _) =>
+        serverName -> (server, ServerStats.empty)
+      })
     }

@@ -1,10 +1,10 @@
 package discodigg
 
 import scalatags.Text.TypedTag
-import zio.{durationInt, Duration, RIO, Schedule, Scope, ULayer, ZIO, ZLayer}
-import zio.http.*
-import zio.ZIO.logInfo
 import scalatags.Text.all.*
+import zio.ZIO
+import zio.ZIO.logInfo
+import zio.http.*
 import zio.http.template.Html
 import zio.metrics.connectors.prometheus.PrometheusPublisher
 
@@ -52,15 +52,28 @@ object WebServer:
       Response.html(
         Html.raw(
           layout("Discord Strežniki") {
-            table(
-              thead(
-                tr(
-                  th("Strežnik"),
-                  th("Člani"),
-                  th("Prisotnost")
+            div(
+              cls := "wrap",
+              div(
+                cls := "servers",
+                table(
+                  thead(
+                    tr(
+                      th("Strežnik"),
+                      th("Člani"),
+                      th("Prisotnost")
+                    )
+                  ),
+                  tbody(raw(content))
                 )
               ),
-              tbody(raw(content))
+              div(
+                cls := "footer",
+                p(
+                  style := "text-align: center; margin-top: 20px;",
+                  a(href := "https://github.com/otobrglez/discodigg", "otobrglez/discodigg")
+                )
+              )
             )
           }.render
         )

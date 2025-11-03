@@ -17,21 +17,13 @@ in
     pkgs-unstable.k9s
     pkgs-unstable.kubectl
     pkgs-unstable.kubectx
-    pkgs-unstable.nodejs_24
     pkgs-unstable.just
     pkgs-unstable.scala-cli
   ];
 
   languages.java = {
     enable = true;
-    jdk.package = pkgs-unstable.jdk24_headless;
-  };
-
-  languages.javascript = {
-    enable = true;
-    package = pkgs-unstable.nodejs_24;
-    yarn.enable = true;
-    yarn.install.enable = true;
+    jdk.package = pkgs-unstable.jdk25_headless;
   };
 
   env = {

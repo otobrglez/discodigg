@@ -77,7 +77,9 @@ kind: ServiceMonitor
 metadata:
   name: discodigg
   namespace: discodigg-prod
-  labels: { app: discodigg }
+  labels:
+    app: discodigg
+    release: prom
 spec:
   selector:
     matchLabels: { app: discodigg }
