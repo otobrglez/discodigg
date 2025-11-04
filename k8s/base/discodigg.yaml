@@ -78,7 +78,7 @@ metadata:
   name: discodigg
   namespace: discodigg-prod
   labels:
-    app: discodigg
+    # app: discodigg
     release: prom
 spec:
   selector:
