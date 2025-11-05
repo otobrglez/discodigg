@@ -15,7 +15,7 @@ import zio.Cause.Empty
 import java.nio.charset.Charset
 import java.nio.file.{Files, Path}
 
-final case class DiscordServer(name: String, inviteUrl: URL)
+final case class DiscordServer(name: String, inviteUrl: URL, iconUrl: Option[URL] = None)
 object DiscordServer:
   given discordServerDecoder: Decoder[DiscordServer] = deriveDecoder[DiscordServer]
   given discordServerEncoder: Encoder[DiscordServer] = deriveEncoder[DiscordServer]
@@ -26,8 +26,8 @@ object DiscordServer:
   def fromPath(path: Path): Task[List[DiscordServer]] = for
     data        <- ZIO.attempt(Files.readString(path, Charset.forName("UTF-8")))
     rawServers  <- fromEither(parseYaml(data))
-    serversRoot <- fromOption(rawServers.hcursor.downField("servers").focus)
-                     .orElseFail(new Exception("No servers found."))
+    serversRoot <-
+      fromOption(rawServers.hcursor.downField("servers").focus).orElseFail(new Exception("No servers found."))
     servers     <- ZIO.fromEither(serversRoot.as[List[DiscordServer]])
   yield servers
 
@@ -51,23 +51,28 @@ final case class Profile(
   premium_tier: Int
 )
 object Profile:
-  given profileDecoder: Decoder[Profile] = deriveDecoder[Profile]
+  given profileDecoder: Decoder[Profile] = deriveDecoder
+
+final case class Guild(id: String, name: String, premium_subscription_count: Int, icon: String)
+object Guild:
+  given guildDecoder: Decoder[Guild] = deriveDecoder
 
 final case class Invite(
   code: String,
   profile: Profile,
+  guild: Option[Guild],
   approximate_member_count: Option[Int],
   approximate_presence_count: Option[Int]
 )
 object Invite:
-  given inviteDecoder: Decoder[Invite] = deriveDecoder[Invite]
+  given inviteDecoder: Decoder[Invite] = deriveDecoder
 
 final case class APIError(
   message: String,
   retry_after: Option[Double]
 )
 object APIError:
-  given apiErrorDecoder: Decoder[APIError] = deriveDecoder[APIError]
+  given apiErrorDecoder: Decoder[APIError] = deriveDecoder
 
 final class DiscordAPI private (private val client: Client):
   private given Decoder[Either[APIError, Invite]] =
@@ -111,6 +116,15 @@ final class DiscordAPI private (private val client: Client):
     loop(0, baseDelay)
 
 object DiscordAPI:
+
+  def resolveInviteWithRetry(
+    code: String,
+    maxRetries: Int = 8,
+    baseDelay: Duration = 200.millis,
+    maxDelay: Duration = 30.seconds
+  ): RIO[DiscordAPI, Invite] =
+    ZIO.serviceWithZIO[DiscordAPI](_.resolveInviteWithRetry(code, maxRetries, baseDelay, maxDelay))
+
   def live: RLayer[Client, DiscordAPI] = ZLayer.fromZIO:
     for
       discordAPIRoot <- ZIO.fromEither(URL.decode("https://discord.com/api/v10/"))

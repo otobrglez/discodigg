@@ -11,24 +11,30 @@ import zio.metrics.connectors.prometheus.PrometheusPublisher
 import java.nio.charset.{Charset, StandardCharsets}
 
 object WebServer:
+  private val mainTitle = " 🇸🇮 Slovenski Discord Strežniki 🇸🇮".trim
 
-  private def layout(title: String = "Discord Strežniki")(contentBody: TypedTag[String]*) =
+  private def layout(title: String = mainTitle)(contentBody: TypedTag[String]*) =
     html(
       head(
         meta(charset := "UTF-8"),
         meta(name    := "viewport", content := "width=device-width, initial-scale=1"),
         tag("title")(title),
         tag("style")(
-          """html, body { font-family: sans-serif; font-size: 14pt; line-height: 1.5; }
+          """html, body { font-family: Menlo, sans-serif; font-size: 14pt; line-height: 1.3; font-weight: 400; }
             |#app { margin: 0 auto; padding: 10px; max-width: 960px; }
             |#app table { border-collapse: collapse; margin: 0 auto; }
-            |#app table td { padding: 5px; } """.stripMargin
+            |#app table td, #app table th { padding: 4px; }
+            |#app table img.icon { width: 40px; height: 40px; }""".stripMargin
         )
       ),
       body(
         div(id := "app", contentBody)
       )
     )
+
+  private def icon(server: DiscordServer): TypedTag[String] = server.iconUrl match
+    case Some(value) => img(src := value.toString, cls := "icon")
+    case None        => span(cls := "icon")
 
   private def renderServers: ZIO[ServersMap, String, String] =
     ServersMap.all
@@ -39,9 +45,9 @@ object WebServer:
             val members   = stats.memberCount.toString
             val presences = stats.presenceCount.toString
             s"""<tr>
+               |  <td>${icon(server)}</td>
                |  <td>${server.name}</td>
-               |  <td>$members</td>
-               |  <td>$presences</td>
+               |  <td style="text-align:center;">$presences / $members</td>
                |</tr>""".stripMargin
           }
           .mkString
@@ -51,7 +57,7 @@ object WebServer:
     Method.GET / Root     -> handler(renderServers).map(content =>
       Response.html(
         Html.raw(
-          layout("Discord Strežniki") {
+          layout(mainTitle) {
             div(
               cls := "wrap",
               div(
@@ -59,9 +65,8 @@ object WebServer:
                 table(
                   thead(
                     tr(
-                      th("Strežnik"),
-                      th("Člani"),
-                      th("Prisotnost")
+                      th(colspan := "2", mainTitle),
+                      th("Prisotnost / Članstvo")
                     )
                   ),
                   tbody(raw(content))

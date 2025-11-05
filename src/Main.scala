@@ -87,6 +87,7 @@ object Main extends ZIOCliDefault:
     case (refreshInterval: Duration, path: Path)                 =>
       serviceWithZIO[Collector](_.run(refreshInterval))
         .provide(
+          Scope.default,
           Client.default,
           DiscordAPI.live,
           Collector.live,
@@ -96,7 +97,7 @@ object Main extends ZIOCliDefault:
 
   private def serversFromPath(path: Path) =
     DiscordServer.fromPath(path).map { servers =>
-      TrieMap.from(servers.map { case server @ DiscordServer(serverName, _) =>
+      TrieMap.from(servers.map { case server @ DiscordServer(serverName, _, _) =>
         serverName -> (server, ServerStats.empty)
       })
     }

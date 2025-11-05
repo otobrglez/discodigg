@@ -33,6 +33,7 @@ spec:
               value: "--sun-misc-unsafe-memory-access=allow --enable-native-access=ALL-UNNAMED"
           volumeMounts:
             - name: config-volume
+              readOnly: true
               mountPath: /tmp/servers.yml
               subPath: servers.yml
 

@@ -25,10 +25,17 @@ final class Collector:
         codeFromInviteURL(server.inviteUrl).mapBoth(_ => new Exception("No code found in invite url"), server -> _)
       )
       .mapZIO((server, code) =>
-        ZIO
-          .serviceWithZIO[DiscordAPI](_.resolveInviteWithRetry(code))
+        DiscordAPI
+          .resolveInviteWithRetry(code)
           .map(invite =>
-            server -> ServerStats(
+            server.copy(
+              iconUrl = invite.guild.map {
+                case g if g.icon.startsWith("a_") =>
+                  URL.decode(s"https://cdn.discordapp.com/icons/${g.id}/${g.icon}.gif").toTry.get
+                case g                            =>
+                  URL.decode(s"https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png").toTry.get
+              }
+            ) -> ServerStats(
               memberCount = invite.approximate_member_count.getOrElse(0),
               presenceCount = invite.approximate_presence_count.getOrElse(0)
             )
@@ -38,13 +45,12 @@ final class Collector:
       .tap((server, stats) =>
         logInfo(s"Collected from ${server.name}. Members: ${stats.memberCount}, presence: ${stats.presenceCount}")
       )
-      .runForeach { case (server, stats) => ServersMap.put(server.name, (server, stats)) }
+      .runForeach { case pair @ (server, _) => ServersMap.put(server.name, pair) }
 
-  def run(refreshInterval: Duration = 20.seconds): RIO[ServersMap & DiscordAPI, Unit] = for
-    fib <-
-      (collect *> logInfo(s"Done. Sleeping for ${refreshInterval.toSeconds}s"))
-        .repeat(Schedule.spaced(refreshInterval))
-        .fork
+  def run(refreshInterval: Duration = 20.seconds): RIO[Scope & ServersMap & DiscordAPI, Unit] = for
+    fib <- (collect *> logInfo(s"Done. Sleeping for ${refreshInterval.toSeconds}s"))
+             .repeat(Schedule.spaced(refreshInterval))
+             .forkScoped
     _   <- logInfo("Started collector.")
     _   <- fib.join
   yield ()
