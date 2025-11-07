@@ -8,7 +8,7 @@ Live: [discord.pinkstack.com - Slovenian Discord Servers](https://discord.pinkst
 
 - Please use [devenv] for development with [Scala CLI][scala-cli].
 - All the "tasks" are written in [`justfile`](./justfile) and can be run with [just](https://just.systems/) command runner.
-- System uses the latest JVM 25, with [ZIO](https://zio.dev/), [ZIO HTTP](https://github.com/zio/zio-http), [HTMX](https://htmx.org/) and [Scala](https://www.scala-lang.org/) 3.x
+- System uses the latest [JVM/JDK 25](https://openjdk.org/projects/jdk/25/), with [Scala CLI](https://scala-cli.virtuslab.org/), [ZIO](https://zio.dev/), [ZIO HTTP](https://github.com/zio/zio-http), [HTMX](https://htmx.org/) and [Scala](https://www.scala-lang.org/) 3.x
 
 ## Deployment
 
