@@ -65,7 +65,7 @@ object Main extends ZIOCliDefault:
       {
         ZIO.raceFirst(
           logInfo(
-            s"Booting server on $port with ${BuildInfo.projectVersion.getOrElse("no-version-dev")}"
+            s"Booting server on http://0.0.0.0:$port with ${BuildInfo.projectVersion.getOrElse("no-version-dev")}"
           ) *> WebServer.run(metricsPort = port.toInt + 1),
           serviceWithZIO[Collector](_.run(refreshInterval)) :: Nil
         )

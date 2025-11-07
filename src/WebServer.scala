@@ -9,6 +9,7 @@ import zio.http.template.Html
 import zio.metrics.connectors.prometheus.PrometheusPublisher
 
 import java.nio.charset.{Charset, StandardCharsets}
+import java.time.LocalDateTime
 
 object WebServer:
   private val mainTitle = " 🇸🇮 Slovenski Discord Strežniki 🇸🇮".trim
@@ -20,12 +21,31 @@ object WebServer:
         meta(name    := "viewport", content := "width=device-width, initial-scale=1"),
         tag("title")(title),
         tag("style")(
-          """html, body { font-family: Menlo, sans-serif; font-size: 14pt; line-height: 1.3; font-weight: 400; }
+          """/* With love! */
+            |:root {
+            |  --bg: #0b1220; --fg: #e5e7eb; --muted: #9aa4b2; --link: #60a5fa; --table-border: #233042;
+            |  --th-bg: #101828; --th-fg: #e5e7eb; --row-hover: #121a2b; --accent: #34d399;
+            |}
+            |@media (prefers-color-scheme: light) {
+            |  :root {
+            |    --bg: #ffffff; --fg: #0f172a; --muted: #475569; --link: #2563eb; --table-border: #e2e8f0;
+            |    --th-bg: #f8fafc; --th-fg: #0f172a; --row-hover: #f1f5f9; --accent: #10b981;
+            |  }
+            |}
+            |html, body { font-family: Menlo, sans-serif; font-size: 12pt; line-height: 1.2; font-weight: 400; background: var(--bg); color: var(--fg); }
             |#app { margin: 0 auto; padding: 10px; max-width: 960px; }
-            |#app table { border-collapse: collapse; margin: 0 auto; }
-            |#app table td, #app table th { padding: 4px; }
-            |#app table img.icon { width: 40px; height: 40px; }""".stripMargin
-        )
+            |a { color: var(--link); text-decoration: none; }
+            |a:hover { text-decoration: underline; }
+            |#app table { width: 100%; border-collapse: collapse; margin: 0 auto; border: 1px solid var(--table-border); }
+            |#app table td, #app table th { padding: 5px; border-bottom: 1px solid var(--table-border); }
+            |#app table th { background: var(--th-bg); color: var(--th-fg); text-align: left; }
+            |#app table tbody tr:hover { background: var(--row-hover); }
+            |#app table img.icon { width: 40px; height: 40px; /* border-radius: 8px; */ }
+            |.footer { color: var(--muted); }
+            |.center { text-align: center; }
+            |""".stripMargin
+        ),
+        script(src   := "https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js")
       ),
       body(
         div(id := "app", contentBody)
@@ -59,21 +79,34 @@ object WebServer:
         Html.raw(
           layout(mainTitle) {
             div(
-              cls := "wrap",
               div(
-                cls := "servers",
-                table(
-                  thead(
-                    tr(
-                      th(colspan := "2", mainTitle),
-                      th("Prisotnost / Članstvo")
+                cls                   := "wrap",
+                attr("hx-trigger")    := "every 3s",
+                attr("hx-get")        := "/",
+                attr("hx-target")     := "#servers",
+                attr("hx-select-oob") := "#servers",
+                attr("hx-swap")       := "innerHTML",
+                div(
+                  id  := "servers",
+                  cls := "servers",
+                  table(
+                    thead(
+                      tr(
+                        th(colspan := "2", mainTitle),
+                        th("Prisotnost / Članstvo")
+                      )
+                    ),
+                    tbody(raw(content)),
+                    tfoot(
+                      tr(
+                        td(colspan := "3", p(style := "text-align:center;", s"Zadnja osvežitev: ${LocalDateTime.now}"))
+                      )
                     )
-                  ),
-                  tbody(raw(content))
+                  )
                 )
               ),
               div(
-                cls := "footer",
+                cls                   := "footer",
                 p(
                   style := "text-align: center; margin-top: 20px;",
                   a(href := "https://github.com/otobrglez/discodigg", "otobrglez/discodigg")
