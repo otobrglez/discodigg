@@ -29,7 +29,7 @@ spec:
             - { name: OTEL_TRACES_EXPORTER, value: "none" }
             - { name: OTEL_METRICS_EXPORTER, value: "none" }
             - { name: OTEL_LOGS_EXPORTER, value: "none" }
-            - { name: X, value: "1" }
+            - { name: X, value: "10" }
             - name: JAVA_OPTS
               value: "--sun-misc-unsafe-memory-access=allow --enable-native-access=ALL-UNNAMED"
           volumeMounts:
