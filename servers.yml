@@ -58,7 +58,8 @@ servers:
     inviteUrl: https://discord.gg/zwnEbB98
   - name: Cyber Night
     inviteUrl: https://discord.gg/UZRck9YZT
-
+  - name: OSGeo Slovenija
+    inviteUrl: https://discord.gg/9anJVENB
 # Broken
 #  - name: slo-racing.com
 #    inviteUrl: https://discord.com/invite/rSKvkQzH
