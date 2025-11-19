@@ -6,12 +6,11 @@
 //> using dep dev.zio::zio-cli:0.7.4
 //> using dep dev.zio::zio-test:2.1.22
 //> using dep dev.zio::zio-logging:2.5.1
-//> using dep org.duckdb:duckdb_jdbc:1.4.1.0
 //> using dep io.circe::circe-core:0.14.15
 //> using dep io.circe::circe-generic:0.14.15
 //> using dep io.circe::circe-parser:0.14.15
 //> using dep io.circe::circe-yaml-v12:1.15.0
-//> using dep ch.qos.logback:logback-classic:1.5.20
+//> using dep ch.qos.logback:logback-classic:1.5.21
 //> using dep dev.zio::zio-logging:2.5.1
 //> using dep dev.zio::zio-logging-slf4j2:2.5.1
 //> using dep com.lihaoyi::scalatags:0.13.1
@@ -97,7 +96,7 @@ object Main extends ZIOCliDefault:
 
   private def serversFromPath(path: Path) =
     DiscordServer.fromPath(path).map { servers =>
-      TrieMap.from(servers.map { case server @ DiscordServer(serverName, _, _) =>
+      TrieMap.from(servers.map { case server @ DiscordServer(serverName, _, _, _) =>
         serverName -> (server, ServerStats.empty)
       })
     }
