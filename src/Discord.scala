@@ -14,17 +14,46 @@ import zio.Cause.Empty
 
 import java.nio.charset.Charset
 import java.nio.file.{Files, Path}
+import java.time.LocalDateTime
+import scala.util.{Failure, Try}
 
-final case class DiscordServer(name: String, inviteUrl: URL, iconUrl: Option[URL] = None)
+enum ServerState:
+  case Booting                                            extends ServerState
+  case Ok(updatedAt: LocalDateTime = LocalDateTime.now()) extends ServerState
+  case Error(message: String)                             extends ServerState
+object ServerState:
+  given serverStateEncoder: Encoder[ServerState] = Encoder.encodeString.contramap(_.toString)
+  given serverStateDecoder: Decoder[ServerState] =
+    Decoder.decodeString.emapTry(raw => Failure(new Exception(s"Unimplemented. In: ${raw}")))
+
+final case class DiscordServer(
+  name: String,
+  inviteUrl: URL,
+  iconUrl: Option[URL] = None,
+  state: ServerState = ServerState.Booting
+)
 object DiscordServer:
-  given discordServerDecoder: Decoder[DiscordServer] = deriveDecoder[DiscordServer]
-  given discordServerEncoder: Encoder[DiscordServer] = deriveEncoder[DiscordServer]
+  given urlDecoder: Decoder[URL]                     = Decoder.decodeString.emapTry(url => URL.decode(url).toTry)
+  given discordServerDecoder: Decoder[DiscordServer] =
+    Decoder.forProduct4(
+      "name",
+      "inviteUrl",
+      "iconUrl",
+      "state"
+    ) { (name: String, inviteUrl: URL, iconUrl: Option[URL], stateOpt: Option[ServerState]) =>
+      DiscordServer(
+        name = name,
+        inviteUrl = inviteUrl,
+        iconUrl = iconUrl,
+        state = stateOpt.getOrElse(ServerState.Booting)
+      )
+    }
 
-  given urlDecoder: Decoder[URL] = Decoder.decodeString.emapTry(url => URL.decode(url).toTry)
-  given URLEncoder: Encoder[URL] = Encoder.encodeString.contramap(_.toString)
+  given URLEncoder: Encoder[URL]                     = Encoder.encodeString.contramap(_.toString)
+  given discordServerEncoder: Encoder[DiscordServer] = deriveEncoder
 
   def fromPath(path: Path): Task[List[DiscordServer]] = for
-    data        <- ZIO.attempt(Files.readString(path, Charset.forName("UTF-8")))
+    data        <- ZIO.attemptBlocking(Files.readString(path, Charset.forName("UTF-8")))
     rawServers  <- fromEither(parseYaml(data))
     serversRoot <-
       fromOption(rawServers.hcursor.downField("servers").focus).orElseFail(new Exception("No servers found."))
@@ -109,7 +138,7 @@ final class DiscordAPI private (private val client: Client):
           ZIO.fail(new Exception(s"Rate limited and exceeded max retries ($maxRetries): ${err.message}"))
         else
           logWarningCause(
-            s"Code: $code. Rate limited: ${err.message}. Retrying in ${delay.toMillis}ms (attempt ${attempt + 1}/$maxRetries)",
+            s"Code: $code. Message: ${err.message}. Retrying in ${delay.toMillis}ms (attempt ${attempt + 1}/$maxRetries)",
             Cause.empty
           ) *>
             ZIO.sleep(delay) *> loop(attempt + 1, (delay * 2).min(maxDelay))
@@ -119,7 +148,7 @@ object DiscordAPI:
 
   def resolveInviteWithRetry(
     code: String,
-    maxRetries: Int = 8,
+    maxRetries: Int = 4,
     baseDelay: Duration = 200.millis,
     maxDelay: Duration = 30.seconds
   ): RIO[DiscordAPI, Invite] =
