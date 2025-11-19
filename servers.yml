@@ -71,8 +71,6 @@ servers:
   - name: slo-racing.com
     inviteUrl: https://discord.com/invite/K5ZC2ZxY
 # Broken
-#  - name: slo-racing.com
-#    inviteUrl: https://discord.com/invite/rSKvkQzH
 #  - name: nepridiprav
 #    inviteUrl: https://discord.gg/rbFTdeZn4F
 #   - name: trollgang
