@@ -61,14 +61,21 @@ object WebServer:
       .map(
         _.toList
           .sortBy(-_._2.presenceCount)
-          .map { case (server, stats) =>
-            val members   = stats.memberCount.toString
-            val presences = stats.presenceCount.toString
-            s"""<tr>
-               |  <td>${icon(server)}</td>
-               |  <td>${server.name}</td>
-               |  <td style="text-align:center;">$presences / $members</td>
-               |</tr>""".stripMargin
+          .map {
+            case (server @ DiscordServer(_, _, _, ServerState.Error(message)), _) =>
+              s"""<tr>
+                 |  <td>${icon(server)}</td>
+                 |  <td>${server.name}</td>
+                 |  <td style="text-align:center;">-- Error --</td>
+                 |</tr>""".stripMargin
+            case (server, stats)                                                  =>
+              val members   = stats.memberCount.toString
+              val presences = stats.presenceCount.toString
+              s"""<tr>
+                 |  <td>${icon(server)}</td>
+                 |  <td>${server.name}</td>
+                 |  <td style="text-align:center;">$presences / $members</td>
+                 |</tr>""".stripMargin
           }
           .mkString
       )
