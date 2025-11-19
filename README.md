@@ -28,6 +28,9 @@ docker run --rm \
 
 ```
 
+Port `8081` is for the UI, and port `8082` is for serving [Prometheus metrics](https://prometheus.io/).
+
+There is also a Kubernetes deployment in the [k8s](./k8s/) folder.
 
 ## Author
 
