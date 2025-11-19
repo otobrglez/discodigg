@@ -59,7 +59,7 @@ servers:
   - name: Cyber Night
     inviteUrl: https://discord.gg/UZRck9YZT
   - name: OSGeo Slovenija
-    inviteUrl: https://discord.gg/9anJVENB
+    inviteUrl: https://discord.gg/2q86RRMpRC
   - name: RIS - Reševalno Informacijski Sistem
     inviteUrl: https://discord.com/invite/Js58JekkXU
   - name: INFIRE.si
@@ -68,6 +68,8 @@ servers:
     inviteUrl: https://discord.gg/J5YtR6Z3wB
   - name: Študentski svet FRI
     inviteUrl: https://discord.gg/EfKxDptSU9
+  - name: slo-racing.com
+    inviteUrl: https://discord.com/invite/K5ZC2ZxY
 # Broken
 #  - name: slo-racing.com
 #    inviteUrl: https://discord.com/invite/rSKvkQzH
