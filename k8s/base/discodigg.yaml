@@ -25,7 +25,7 @@ spec:
 
           args: [ "server", "--refresh-interval=PT360S", "/tmp/servers.yml" ]
           env:
-            - { name: DEPLOY, value: "0.0.15" }
+            - { name: DEPLOY, value: "0.0.16" }
             - { name: OTEL_TRACES_EXPORTER, value: "none" }
             - { name: OTEL_METRICS_EXPORTER, value: "none" }
             - { name: OTEL_LOGS_EXPORTER, value: "none" }
