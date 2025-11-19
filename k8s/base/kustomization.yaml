@@ -4,4 +4,4 @@ resources:
   - discodigg.yaml
 images:
   - name: ghcr.io/otobrglez/discodigg
-    newTag: '0.0.10'
+    newTag: '0.0.12'
